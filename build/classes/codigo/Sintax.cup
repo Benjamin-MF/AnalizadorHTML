@@ -1,0 +1,177 @@
+package codigo;
+
+import java_cup.runtime.Symbol;
+
+parser code
+{:
+    
+    public String resultado="";
+    private Symbol s;
+    
+    public void syntax_error(Symbol s){
+        //this.s = s;
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        
+    }
+
+    public Symbol getS(){
+        return this.s;
+}
+:};
+
+terminal
+INICIO_HTML,
+INICIO_ENCABEZADO,
+TITULO, 
+FINAL_TITULO,
+FINAL_ENCABEZADO,
+INICIO_TABLA,
+INICIO_CUERPO, 
+FILA_INICIO, 
+FINAL_FILA, 
+COLUMNA, 
+FINAL_TABLA, 
+TEXTO_FUERTE,
+TEXTO_FUERTE_FIN, 
+SALIDA_TEXTO,
+INICIO_LISTA,
+ENLACE_WEB, 
+INICIO_IMAGEN,
+NOMBRE_ELEMENTO,
+MEDIDA_ANCHO,
+MEDIDA_ALTURA,
+FINAL_IMAGEN,
+FINAL_HTML,
+BORDE_TABLA, 
+FINAL_CUERPO,
+FINAL_LISTA, 
+NUMERO_ENTERO,
+NMERO_DECIMAL,
+CORREO_ELECTRONICO, 
+CADENA_NO_ESPECIFICA, 
+Comilla, 
+URL, 
+PARENTESIS_APERTURA,
+PARENTESIS_CIERRE, 
+SIGNO_MULTIPLICACION,
+SIGNO_SUMA, 
+SIGNO_RESTA,
+PUNTO_COMA,
+SIGNO_IGUAL,
+DOS_PUNTOS,
+COMA,
+COLUMNA_FIN, 
+NUMERO_DECIMAL,
+LINEA_DIVISORA,
+INICIO_ETIQUETA, 
+FINAL_ETIQUETA, 
+SALTO_LINEA, 
+INICIO_DIALOGO,
+FINAL_DIALOGO,
+INICIO_PARRAFO, 
+FINAL_PARRAFO,
+INICIO_ELEMENTO_LISTA,
+FINAL_ELEMENTO_LISTA, 
+INICIO_MENU, 
+FINAL_MENU,
+Error;
+
+non terminal
+INICIAL,
+INICIO_DOCUMENTO,
+LISTA,
+ESTRUCTURA_TABLA,
+ESTRUCTURA_COLUMNA,
+ESTRUCTURA_FILA,
+OPERACIONES,
+IMAGEN,
+FILA,
+FIN_DOCUMENTO,
+ESTRUCTURA_HTML,
+ENCABEZADO,
+ESTRUCTURA_CUERPO,
+ESTRUCTURA_TITULO,
+ESTRUCTURA_PARRAFO,
+ESTRUCTURA_LISTA,
+CONTENIDO,
+LINEA,
+ESTRUCTURA_ETIQUETA;
+
+start with INICIAL;
+
+INICIAL ::= ESTRUCTURA_HTML;
+
+
+ESTRUCTURA_HTML ::= INICIO_HTML:a ENCABEZADO:b ESTRUCTURA_CUERPO:d FINAL_HTML:c {:
+                                    resultado = "<HTML>\n" + String.valueOf(b) + "</HTML> \n"; 
+                                :}
+;
+
+ENCABEZADO ::= INICIO_ENCABEZADO:a ESTRUCTURA_TITULO:c FINAL_ENCABEZADO:d
+                                {:
+                                   RESULT = "<head> \n" + String.valueOf(c) + "</head> \n";
+                                :}
+;
+
+ESTRUCTURA_TITULO ::= TITULO CADENA_NO_ESPECIFICA:a FINAL_TITULO
+            {:
+                RESULT = "<title> \n" + String.valueOf(a) + "</title> \n";
+            :}
+;
+
+ESTRUCTURA_CUERPO::= INICIO_CUERPO ESTRUCTURA_CUERPO:a FINAL_CUERPO
+            {:
+                RESULT = "<body> \n" + String.valueOf(a) + "</body> \n";
+            :}
+;
+ ESTRUCTURA_CUERPO ::= INICIO_DIALOGO ESTRUCTURA_PARRAFO:a FINAL_DIALOGO
+            {:
+                RESUTL = "<dialog> \n" + String.valueOf(a) + "</dialog>";
+            :}
+;
+ ESTRUCTURA_PARRAFO::= INICIO_PARRAFO:b CADENA_NO_ESPECIFICA:c FINAL_PARRAFO:d
+            {:
+                RESULT = "<p> \n" + String.valueOf(c) + "</p> \n";
+            :}
+;
+ ESTRUCTURA_ETIQUETA::= INICIO_ETIQUETA:a CADENA_NO_ESPECIFICA:b FINAL_ETIQUETA:c
+            {:
+                RESULT = "<label> \n" + String.valueOf(b) + "</label> \n";
+            :}
+;
+ ESTRUCTURA_TABLA::= INICIO_TABLA:a ESTRUCTURA_FILA:b FINAL_TABLA:c
+            {:
+                RESULT = "<table class="default"> \n"; + String.valueOf(b) + "</table> \n";
+            :}
+;
+ ESTRUCTURA_FILA::= FILA_INICIO:a ESTRUCTURA_COLUMNA:b FINAL_FILA:c ESTRUCTURA_TABLA:c
+            {:
+                RESULT = "<tr> \n" + String.valueOf(b) + "</tr> \n" + String.valueOf(c);
+            :}
+;
+ ESTRUCTURA_COLUMNA::= COLUMNA CONTENIDO:b COLUMNA_FIN ESTRUCTURA_FILA:c
+            {:
+                RESULT = "<td> \n"+ String.valueOf(b)  + "</td>" + String.valueOf(c);
+            :}
+;
+ LINEA ::= LINEA_DIVISORA {: RESULT = "<hr> \n"; :}
+;
+ NEGRITA::= TEXTO_FUERTE CONTENIDO:b TEXTO_FUERTE_FIN
+                {: RESULT = "<b>" + String.valueOf(b) + "</b> \n";
+                :}
+;
+ LISTA::= INICIO_LISTA:a ESTRUCTURA_LISTA:b FINAL_LISTA:c
+                {:
+                    RESULT = "<ol> \n" + String.valueOf(b) + "</ol> \n";
+                :}
+;
+ ESTRUCTURA_LISTA ::= INICIO_ELEMENTO_LISTA:a CADENA_NO_ESPECIFICA:b FINAL_ELEMENTO_LISTA:c LISTA:d
+                {:
+                    RESULT = "<li> " + String.valueOf(b) + "</li> \n" + String.valueOf(d);
+                :}
+;
+
+CONTENIDO ::= CADENA_NO_ESPECIFICA | NUMERO_DECIMAL | NUMERO_ENTERO | CORREO_ELECTRONICO | URL | ENLACE_WEB;
